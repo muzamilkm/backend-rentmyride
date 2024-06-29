@@ -178,16 +178,30 @@ router.delete('/deleteuser/:id', auth, async (req, res) => {
             return res.status(400).json({ error: 'Invalid credentials' });
         }
 
-        // if (req.user.uuid !== user.uuid){
-        //     return res.status(403).json({ error: 'User not authorized to delete this profile' });
-        // }
+        if (req.user.uuid !== user.uuid){
+            return res.status(403).json({ error: 'User not authorized to delete this profile' });
+        }
 
-        await user.deleteOne({ uuid: req.params.id });
+        await User.deleteOne({ uuid: req.params.id });
         return res.json({ message: 'User deleted' });
     }
     catch(error){
         console.error("Error deleting user " + error);
         res.status(500).json({ error: 'Server error' + error });
+    }
+});
+
+router.get('/getuser/:id', auth, async (req, res) =>{
+    try{
+        const user = await User.findOne({ uuid: req.params.id })
+        if (!user){
+            return res.status(400).json({ error: 'User not found' });
+        }
+        return res.json(user)
+    }
+    catch (error){
+        console.error("Error finding user " + error)
+        res.status(500).json({error: "Server error: " + error})
     }
 });
 

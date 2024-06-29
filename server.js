@@ -20,6 +20,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 })
 
 app.use("/api/users", require("./routes/users"));
+app.use("/api/cars", require("./routes/cars"));
 
 app.get("/api/test", (req, res) => {
     res.json({ message: "Express application for RentMyRide running (test)!" });
