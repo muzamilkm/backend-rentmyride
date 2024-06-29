@@ -3,14 +3,15 @@ const jwt = require('jsonwebtoken')
 const SECRET_KEY = process.env.SECRET_KEY;
 
 function authenticateToken(req, res, next) {
-    const token = req.headers['authorization'];
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
     if (token == null) return res.sendStatus(401).message({err: 'No token provided'});
 
-    jwt.verify(token, SECRET_KEY, (err, user) => {
-        if (err) return res.sendStatus(403).json({err: 'Invalid token. Error: ' + err});
+    jwt.verify(token, SECRET_KEY, (err, user) => { 
+        if (err) return res.status(403).json({ err: 'Invalid token. Error: ' + err });
         req.user = user;
         next();
-    })
+    });
 }
 
 module.exports = authenticateToken;

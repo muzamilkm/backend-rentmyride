@@ -4,6 +4,7 @@ const User = require('../models/User');
 const { v4: uuidv4 } = require('uuid')
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const auth = require('../middleware/jwtAuth');
 
 require ('dotenv').config();
 
@@ -96,20 +97,98 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// router.post('/updateuser:id')
-// {
-//     try{
-//         const { email, password, name, phone, location } = req.body;
-        
+router.post('/updateuser/:id', auth, async (req, res) => {
 
+    try{
+        const { email, password, name, phone, location } = req.body;
         
+        const user = await User.findOne({ uuid: req.params.id });
+        
+        if (!user) {
+            return res.status(400).json({ error: 'User not found' });
+        }
 
-//         res.status(201).json({ message: 'User updated' });
-//     }
-//     catch(error){
-//         console.error("Error updating user " + error);
-//         res.status(500).json({ error: 'Server error' + error });
-//     }
-// }
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.status(400).json({ error: 'Invalid credentials' });
+        }
+
+        if (req.user.uuid !== user.uuid){
+            return res.status(403).json({ error: 'User not authorized to update this profile' });
+        }
+
+        user.email = email;
+        user.name = name;
+        user.phone = phone;
+        user.location = location;
+
+        await user.save();
+
+        res.status(201).json({ message: 'User updated' });
+    }
+    catch(error){
+        console.error("Error updating user " + error);
+        res.status(500).json({ error: 'Server error' + error });
+    }
+});
+
+router.post('/updatepassword/:id', auth, async (req, res) => {
+    
+        try{
+            const { password, newpassword } = req.body;
+            
+            const user = await User.findOne({ uuid: req.params.id });
+
+            if (!user) {
+                return res.status(400).json({ error: 'User not found' });
+            }
+
+            const isMatch = await bcrypt.compare(password, user.password);
+
+            if (req.user.uuid !== user.uuid){
+                console.log(req.user.uuid);
+                return res.status(403).json({ error: 'User not authorized to update this profile' });
+            }
+
+            if (!isMatch) {
+                return res.status(400).json({ error: 'Invalid credentials' });
+            }
+            
+            user.password = newpassword;
+            await user.save();
+            return res.json({ message: 'Password updated' });
+        }
+        catch(error){
+            console.error("Error updating password " + error);
+            res.status(500).json({ error: 'Server error' + error });
+        }
+    });
+
+router.delete('/deleteuser/:id', auth, async (req, res) => {
+    try{        
+        const user = await User.findOne({ uuid: req.params.id });
+        const password = req.body.password;
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!user) {
+            return res.status(400).json({ error: 'User not found' });
+        }
+        else if (!isMatch) {
+            return res.status(400).json({ error: 'Invalid credentials' });
+        }
+
+        // if (req.user.uuid !== user.uuid){
+        //     return res.status(403).json({ error: 'User not authorized to delete this profile' });
+        // }
+
+        await user.deleteOne({ uuid: req.params.id });
+        return res.json({ message: 'User deleted' });
+    }
+    catch(error){
+        console.error("Error deleting user " + error);
+        res.status(500).json({ error: 'Server error' + error });
+    }
+});
 
 module.exports = router;
