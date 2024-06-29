@@ -1,15 +1,18 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
 
 const userSchema = new mongoose.Schema({
-    username: { type: String, required: true, unique: true },
+    uuid: {
+        type: String,
+        default: uuidv4,
+        unique: true,
+      },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    profile: {
-        name: { type: String, required: true },
-        phone: { type: String, required: true },
-        location: { type: String, required: true }
-    },
+    name: { type: String, required: true },
+    phone: { type: String, required: true },
+    location: { type: String, required: true },
     cars: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Car' }],
     bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Booking' }],
     reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }]
