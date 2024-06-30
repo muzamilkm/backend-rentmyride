@@ -13,9 +13,9 @@ const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     phone: { type: String, required: true },
     location: { type: String, required: true },
-    cars: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Car' }],
-    bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Booking' }],
-    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }]
+    cars: [{ type: String, ref: 'Car' }],
+    bookings: [{ type: String, ref: 'Booking' }],
+    reviews: [{ type: String, ref: 'Review' }]
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

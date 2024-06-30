@@ -14,7 +14,7 @@ router.get('/', auth, async (req, res) => {
 
 router.get('/:id', auth, async (req, res) => {
     try {
-        const car = await Car.findOne({ uuid: req.params.id});
+        const car = await Car.findOne({ cuid: req.params.id});
         res.json(car);
     } catch (err) {
         res.status(500).json({ error: err });
@@ -37,6 +37,9 @@ router.post('/', auth, async (req, res) => {
 
     try {
         const savedCar = await car.save();
+
+        await User.updateOne( { uuid: req.user.id }, { $push: { cars: savedCar.cuid } });
+
         res.json(savedCar);
     } catch (err) {
         res.status(500).json({ error: err });
@@ -45,16 +48,17 @@ router.post('/', auth, async (req, res) => {
 
 router.put('/:id', auth, async (req, res) => {
     try {
-        const car = await Car.findOne({ uuid: req.params.id});
+        const car = await Car.findOne({ cuid: req.params.id});
         car.name = req.body.name;
         car.brand = req.body.brand;
         car.year = req.body.year;
+        car.status = req.body.status;
         car.pricePerDay = req.body.pricePerDay;
         car.availability.startDate = req.body.startDate;
         car.availability.endDate = req.body.endDate;
         car.location = req.body.location;
-        const updatedCar = await car.save();
-        res.json(updatedCar);
+        await car.save();
+        res.json(car);
     } catch (err) {
         res.status(500).json({ error: err });
     }
@@ -62,10 +66,41 @@ router.put('/:id', auth, async (req, res) => {
 
 router.delete('/:id', auth, async (req, res) => {
     try {
-        const car = await Car.findOne({ uuid: req.params.id });
-        const removedCar = await Car.deleteOne({ uuid: req.params.id });
-        res.json(removedCar);
+        const car = await Car.findOne({ cuid: req.params.id });
+        await Car.deleteOne({ cuid: req.params.id });
+        res.json(car);
     } catch (err) {
         res.status(500).json({ error: err });
     }
 });
+
+router.get('/getByOwner/:id', auth, async (req, res) => {
+    try {
+        const cars = await Car.find({ owner: req.params.id });
+        res.json(cars);
+    } catch (err) {
+        res.status(500).json({ error: err });
+    }
+});
+
+router.post('/updatestatus/:id', auth, async (req, res) => {
+    try {
+        const car = await Car.findOne({ cuid: req.params.id });
+        car.status = req.body.status;
+        await car.save();
+        res.json(car);
+    } catch (err) {
+        res.status(500).json({ error: err });
+    }
+});
+
+router.get('/getByLocation', auth, async (req, res) => {
+    try {
+        const cars = await Car.find({ location: req.body.location });
+        res.json(cars);
+    } catch (err) {
+        res.status(500).json({ error: err });
+    }
+});
+
+module.exports = router;
