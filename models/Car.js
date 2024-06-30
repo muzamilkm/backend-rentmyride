@@ -15,6 +15,7 @@ const carSchema = new mongoose.Schema({
     location: { type: String, required: true },
     owner: { type: String, ref: 'User' },
     bookings: [{ type: String, ref: 'Booking' }],
+    reviews: [{ type: String, ref: 'Review' }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Car', carSchema);
