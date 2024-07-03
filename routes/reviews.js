@@ -3,7 +3,7 @@ const router = express.Router();
 const Review = require('../models/Review');
 const Car = require('../models/Car');
 const User = require('../models/User');
-const auth = require('../middleware/auth');
+const auth = require('../middleware/jwtAuth');
 
 router.get('/:id', auth, async (req, res) => {
     try {
@@ -77,3 +77,5 @@ router.delete('/:id', auth, async (req, res) => {
         res.status(500).json({ message: error });
     }
 });
+
+module.exports = router;
