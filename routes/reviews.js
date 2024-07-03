@@ -3,6 +3,7 @@ const router = express.Router();
 const Review = require('../models/Review');
 const Car = require('../models/Car');
 const User = require('../models/User');
+const auth = require('../middleware/auth');
 
 router.get('/:id', auth, async (req, res) => {
     try {
