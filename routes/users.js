@@ -100,7 +100,7 @@ router.post('/login', async (req, res) => {
 router.post('/updateuser/:id', auth, async (req, res) => {
 
     try{
-        const { email, password, name, phone, location } = req.body;
+        const { uuid, email, name, phone, location } = req.body;
         
         const user = await User.findOne({ uuid: req.params.id });
         
@@ -108,22 +108,43 @@ router.post('/updateuser/:id', auth, async (req, res) => {
             return res.status(400).json({ error: 'User not found' });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
+        
 
-        if (!isMatch) {
-            return res.status(400).json({ error: 'Invalid credentials' });
-        }
+        // const isMatch = await bcrypt.compare(password, user.password);
 
-        if (req.user.uuid !== user.uuid){
+        // if (!isMatch) {
+        //     return res.status(400).json({ error: 'Invalid credentials' });
+        // }
+
+        if (uuid !== user.uuid){
             return res.status(403).json({ error: 'User not authorized to update this profile' });
         }
 
-        user.email = email;
-        user.name = name;
-        user.phone = phone;
-        user.location = location;
+        const updateData = {};
 
-        await user.save();
+        console.log(email, name,location)
+
+        if (email && email.trim() !== '')
+            {
+                updateData.email = email.trim();
+            }
+        if (name && name.trim() !== ''){
+            updateData.name = name.trim();;
+        }
+        if (phone && phone.trim() !== ''){
+            console.log("phone" + phone)
+            updateData.phone = phone.trim();
+        }
+        if (location && location.trim() !== ''){
+            updateData.location = location.trim();
+        }
+
+        if (Object.keys(updateData).length > 0) {
+            const result = await User.updateOne({ uuid: req.params.id }, { $set: updateData });
+            console.log('Update result:', result);
+        }
+
+        console.log(updateData)
 
         res.status(201).json({ message: 'User updated' });
     }
