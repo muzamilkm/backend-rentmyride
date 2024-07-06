@@ -157,7 +157,7 @@ router.post('/updateuser/:id', auth, async (req, res) => {
 router.post('/updatepassword/:id', auth, async (req, res) => {
     
         try{
-            const { password, newpassword } = req.body;
+            const { uuid, password, newpassword } = req.body;
             
             const user = await User.findOne({ uuid: req.params.id });
 
@@ -167,8 +167,7 @@ router.post('/updatepassword/:id', auth, async (req, res) => {
 
             const isMatch = await bcrypt.compare(password, user.password);
 
-            if (req.user.uuid !== user.uuid){
-                console.log(req.user.uuid);
+            if (uuid !== req.params.id){
                 return res.status(403).json({ error: 'User not authorized to update this profile' });
             }
 
@@ -189,7 +188,7 @@ router.post('/updatepassword/:id', auth, async (req, res) => {
 router.delete('/deleteuser/:id', auth, async (req, res) => {
     try{        
         const user = await User.findOne({ uuid: req.params.id });
-        const password = req.body.password;
+        const { uuid, password } = req.body;
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!user) {
@@ -199,7 +198,7 @@ router.delete('/deleteuser/:id', auth, async (req, res) => {
             return res.status(400).json({ error: 'Invalid credentials' });
         }
 
-        if (req.user.uuid !== user.uuid){
+        if (uuid !== user.uuid){
             return res.status(403).json({ error: 'User not authorized to delete this profile' });
         }
 
