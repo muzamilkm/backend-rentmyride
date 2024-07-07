@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Car = require('../models/Car');
+const User = require('../models/User');
 const auth = require('../middleware/jwtAuth');
 
 router.get('/', auth, async (req, res) => {
@@ -22,29 +23,39 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 router.post('/', auth, async (req, res) => {
-    const car = new Car({
-        name: req.body.name,
-        brand: req.body.brand,
-        year: req.body.year,
-        pricePerDay: req.body.pricePerDay,
-        availability: {
-            startDate: req.body.startDate,
-            endDate: req.body.endDate
-        },
-        location: req.body.location,
-        owner: req.user.id
-    });
+    try{
+        console.log('Request body:', req.body);
+        const { name, brand, year, pricePerDay, startDate, endDate, location, owner, description } = req.body;
 
-    try {
+        if (!name || !brand || !year || !pricePerDay || !startDate || !endDate || !location || !owner) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        const car = new Car({
+            name,
+            brand,
+            year,
+            pricePerDay,
+            availability: {
+                startDate,
+                endDate
+            },
+            location,
+            owner,
+            description
+        });
+
         const savedCar = await car.save();
 
-        await User.updateOne( { uuid: req.user.id }, { $push: { cars: savedCar.cuid } });
+        await User.updateOne({ uuid: owner }, { $push: { cars: car.cuid } });
 
         res.json(savedCar);
     } catch (err) {
-        res.status(500).json({ error: err });
+        console.error('Error saving car:', err);
+        res.status(500).json({ error: err.message || 'Server error' });
     }
 });
+    
 
 router.put('/:id', auth, async (req, res) => {
     try {

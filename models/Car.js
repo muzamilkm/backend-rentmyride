@@ -9,11 +9,12 @@ const carSchema = new mongoose.Schema({
     status: { type: String, default: 'Available' },
     pricePerDay: { type: Number, required: true },
     availability: {
-        startDate: { type: Date, required: true },
-        endDate: { type: Date, required: true }
+        startDate: { type: String, required: true },
+        endDate: { type: String, required: true }
     },
     location: { type: String, required: true },
     owner: { type: String, ref: 'User' },
+    description: { type: String },
     bookings: [{ type: String, ref: 'Booking' }],
     reviews: [{ type: String, ref: 'Review' }]
 }, { timestamps: true });
