@@ -60,14 +60,24 @@ router.post('/', auth, async (req, res) => {
 router.put('/:id', auth, async (req, res) => {
     try {
         const car = await Car.findOne({ cuid: req.params.id});
-        car.name = req.body.name;
-        car.brand = req.body.brand;
-        car.year = req.body.year;
-        car.status = req.body.status;
-        car.pricePerDay = req.body.pricePerDay;
-        car.availability.startDate = req.body.startDate;
-        car.availability.endDate = req.body.endDate;
-        car.location = req.body.location;
+        if (req.body.name)
+            car.name = req.body.name;
+        if (req.body.brand)
+            car.brand = req.body.brand;
+        if (req.body.year)
+            car.year = req.body.year;
+        if (req.body.status)
+            car.status = req.body.status;
+        if (req.body.pricePerDay)
+            car.pricePerDay = req.body.pricePerDay;
+        if (req.body.startDate)
+            car.availability.startDate = req.body.startDate;
+        if (req.body.endDate)
+            car.availability.endDate = req.body.endDate;
+        if (req.body.location)
+            car.location = req.body.location;
+        if (req.body.owner)
+            car.description = req.body.description;
         await car.save();
         res.json(car);
     } catch (err) {
