@@ -17,15 +17,17 @@ router.post('/', auth, async (req, res) => {
     const booking = new Booking({
         car: req.body.car,
         renter: req.user.id,
+        renting:{
         startDate: req.body.startDate,
         endDate: req.body.endDate,
+        },
         totalCost: req.body.totalCost
     });
 
     try {
         await booking.save();
         const car = await Car.findOne( { cuid: req.body.car });
-        car.status = 'Booked';
+        car.status = 'booked';
         car.bookings.push(booking.buid);
         await car.save();
         const renter = await User.findOne( { uuid: req.user.id });
@@ -41,7 +43,7 @@ router.delete('/:id', auth, async (req, res) => {
     try {
         const booking = await Booking.findOne( { buid: req.params.id });
         const car = await Car.findOne( { cuid: booking.car });
-        car.status = 'Available';
+        car.status = 'available';
         car.bookings = car.bookings.filter(booking => booking !== req.params.id);
         await car.save();
         const renter = await User.findOne( { uuid: booking.renter });
