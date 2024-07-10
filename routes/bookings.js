@@ -16,7 +16,7 @@ router.get('/:id', auth, async (req, res) => {
 router.post('/', auth, async (req, res) => {
     const booking = new Booking({
         car: req.body.car,
-        renter: req.user.id,
+        renter: req.body.renter,
         renting:{
         startDate: req.body.startDate,
         endDate: req.body.endDate,
@@ -30,7 +30,7 @@ router.post('/', auth, async (req, res) => {
         car.status = 'booked';
         car.bookings.push(booking.buid);
         await car.save();
-        const renter = await User.findOne( { uuid: req.user.id });
+        const renter = await User.findOne( { uuid: req.body.renter });
         renter.bookings.push(booking.buid);
         await renter.save();
         res.json(booking);
