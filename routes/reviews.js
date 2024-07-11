@@ -39,6 +39,7 @@ router.post('/:id', auth, async (req, res) => {
         await car.save();
         const reviewer = await User.findOne({ uuid: req.body.reviewer });
         reviewer.reviews.push(review.ruid);
+        await reviewer.save();
         res.json(review);
         
     } catch (error) {

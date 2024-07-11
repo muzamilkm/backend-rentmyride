@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Booking = require('../models/Booking');
 const Car = require('../models/Car');
+const User = require('../models/User');
 const auth = require('../middleware/jwtAuth');
 
 router.get('/:id', auth, async (req, res) => {
@@ -31,7 +32,13 @@ router.post('/', auth, async (req, res) => {
         car.bookings.push(booking.buid);
         await car.save();
         const renter = await User.findOne( { uuid: req.body.renter });
-        renter.bookings.push(booking.buid);
+        if (renter){
+            renter.bookings.push(booking.buid);
+            console.log("Renter doc found")
+        }
+        else{
+            console.log("Renter doc not found")
+        }
         await renter.save();
         res.json(booking);
     } catch (err) {
