@@ -7,7 +7,7 @@ const auth = require('../middleware/jwtAuth');
 
 router.get('/:id', auth, async (req, res) => {
     try {
-        const reviews = await Review.find({ cuid: req.params.id })
+        const reviews = await Review.find({ car: req.params.id })
         res.json(reviews);
     } catch (error) {
         res.status(500).json({ message: error.message });
