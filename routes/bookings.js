@@ -74,4 +74,22 @@ router.post('/updatestatus/:id', auth, async (req, res) => {
     }
 });
 
+router.get('/user/:id', auth, async (req, res) => {
+    try {
+        const bookings = await Booking.find({ renter: req.params.id });
+        res.json(bookings);
+    } catch (err) {
+        res.status(500).json({ error: err });
+    }
+});
+
+router.get('/car/:id', auth, async (req, res) => {
+    try {
+        const bookings = await Booking.find({ car: req.params.id });
+        res.json(bookings);
+    } catch (err) {
+        res.status(500).json({ error: err });
+    }
+});
+
 module.exports = router;
