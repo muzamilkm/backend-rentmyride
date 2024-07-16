@@ -32,3 +32,5 @@ app.get("/api/test", (req, res) => {
 app.listen(port, () => {
     console.log("Express Application for RentMyRide running on port " + port);
 })
+
+module.exports = app;
