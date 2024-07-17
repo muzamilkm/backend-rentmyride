@@ -19,10 +19,10 @@ mongoose.connect(process.env.MONGODB_URI, {
     console.log("Error connecting to MongoDB", err);
 })
 
-app.use("/api/users", require("./routes/users"));
-app.use("/api/cars", require("./routes/cars"));
-app.use("/api/bookings", require("./routes/bookings"));
-app.use("/api/reviews", require("./routes/reviews"));
+app.use("/api/users", require("../routes/users"));
+app.use("/api/cars", require("../routes/cars"));
+app.use("/api/bookings", require("../routes/bookings"));
+app.use("/api/reviews", require("../routes/reviews"));
 
 app.get("/api/test", (req, res) => {
     res.json({ message: "Express application for RentMyRide running (test)!" });
